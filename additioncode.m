@@ -1,30 +1,84 @@
-clc
-clear all
-
-f = input("Enter the name of the file: ");
-open_system(f)
-
-if(is_simulink_loaded)
-     fprintf("open successfully\n");
+function tests = test_and_gate_model()
+    tests = functiontests(localfunctions);
 end
 
-is_loaded = bdIsLoaded(f);
-if(is_loaded)
-     fprintf("Model is loaded successfully\n ");
-else
-      disp("Model load is not successful");
+function setupOnce(testCase)
+    % Load the Simulink model
+    load_system('and_gate_model.slx');
 end
 
-run(f);
-simOut=sim(f);
-set_param(f,"SimulationCommand","start");
+function teardownOnce(testCase)
+    % No teardown required
+end
 
-%if simOut.get('Error') == 0
-%    disp("No errors");
-%end
 
-if isempty(simOut)
-    disp('No simulation results found. Check for errors or warnings.');
-else
-    disp('Simulation completed successfully.');
+
+%% Test Functions
+function testAND_TrueTrue(testCase)
+    % Test case: a = 1, b = 1
+    set_param('and_gate_model/Constant', 'Value', '1');
+    set_param('and_gate_model/Constant1', 'Value', '1');
+    % Run the simulation
+    sim('and_gate_model.slx');
+    % Get the output from the Display block
+    save matlab.mat;
+    load matlab.mat ans;
+    a=ans.simout.Data;
+    
+   % output = get_param('and_gate_model/Display', 'Format');
+    
+    % Assert the output
+    testCase.verifyEqual(double(a), 0)
+    clear ans
+end
+function testAND_TrueFalse(testCase)
+    % Test case: a = 1, b = 1
+    set_param('and_gate_model/Constant', 'Value', '1');
+    set_param('and_gate_model/Constant1', 'Value', '0');
+    % Run the simulation
+    sim('and_gate_model.slx');
+    % Get the output from the Display block
+    save matlab.mat;
+    load matlab.mat ans;
+    a=ans.simout.Data;
+    
+   % output = get_param('and_gate_model/Display', 'Format');
+    
+    % Assert the output
+    testCase.verifyEqual(double(a), 0)
+    clear ans
+end
+function testAND_FalseTrue(testCase)
+    % Test case: a = 1, b = 1
+    set_param('and_gate_model/Constant', 'Value', '0');
+    set_param('and_gate_model/Constant1', 'Value', '1');
+    % Run the simulation
+    sim('and_gate_model.slx');
+    % Get the output from the Display block
+    save matlab.mat;
+    load matlab.mat ans;
+    a=ans.simout.Data;
+    
+   % output = get_param('and_gate_model/Display', 'Format');
+    
+    % Assert the output
+    testCase.verifyEqual(double(a), 0)
+    clear ans
+end
+function testAND_FalseFalse(testCase)
+    % Test case: a = 1, b = 1
+    set_param('and_gate_model/Constant', 'Value', '0');
+    set_param('and_gate_model/Constant1', 'Value', '0');
+    % Run the simulation
+    sim('and_gate_model.slx');
+    % Get the output from the Display block
+    save matlab.mat;
+    load matlab.mat ans;
+    a=ans.simout.Data;
+    
+   % output = get_param('and_gate_model/Display', 'Format');
+    
+    % Assert the output
+    testCase.verifyEqual(double(a), 0)
+    clear ans
 end
